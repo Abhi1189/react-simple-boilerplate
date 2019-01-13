@@ -20,13 +20,9 @@ class App extends Component {
     }
 
     this.addMessage = this.addMessage.bind(this);
-    this.getRandomId = this.getRandomId.bind(this);
+
     this.changeUser = this.changeUser.bind(this);
     // this.socket.onmessage = this.socket.onmessage.bind(this);
-  }
-
-  getRandomId() {
-    return Math.floor(Math.random() * Math.floor(100000000000000));
   }
 
   addMessage(contentPassedFromChatbar) {

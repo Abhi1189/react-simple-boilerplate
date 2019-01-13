@@ -35,7 +35,7 @@ class Chatbar extends Component {
       // console.log(':Chatbar: event target:', event.target.value)
       
       this.props.addMessage(event.target.value);
-
+      event.target.value = '';
     }
   }
   render() {
