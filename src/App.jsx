@@ -15,12 +15,13 @@ class App extends Component {
 
     this.state = {
       currentUser: {name: 'Bob'},
-      
+      userCount: 0,
       messages: []
     }
 
     this.addMessage = this.addMessage.bind(this);
     this.getRandomId = this.getRandomId.bind(this);
+    this.changeUser = this.changeUser.bind(this);
     // this.socket.onmessage = this.socket.onmessage.bind(this);
   }
 
@@ -31,16 +32,40 @@ class App extends Component {
   addMessage(contentPassedFromChatbar) {
     const newMessage = {
       id: uuidv4(),
+      type: "message",
       content: contentPassedFromChatbar,
       username: this.state.currentUser.name
     }
 
     this.socket.send(JSON.stringify(newMessage));
-    const newMessages = this.state.messages.concat(newMessage);
-    this.setState(
-      {messages: newMessages}
-    );
     
+    // Keep this code in, for future mods.
+    
+    // const newMessages = this.state.messages.concat(newMessage);
+    //this.setState(
+    //  {messages: newMessages}
+    // );
+    
+  }
+
+
+  changeUser(incomingUser) {
+    var oldUsername = this.state.currentUser.name;
+    var newUserName = incomingUser;
+    var notificationMessage = oldUsername + " changed his name to "+newUserName;
+    console.log(notificationMessage);
+
+    const newNotification = {
+      id: uuidv4(),
+      type: "notification",
+      content: notificationMessage,
+      //username: this.state.currentUser.name
+    }
+
+    this.socket.send(JSON.stringify(newNotification));
+    this.setState({
+      currentUser: {name: incomingUser}
+    });
   }
 
   componentDidMount() {
@@ -51,21 +76,31 @@ class App extends Component {
       console.log('Connected to Socket server');
 
       this.socket.onmessage = (event) => {
-        console.log(event);
-        const incomingMessage = JSON.parse(event.data);
         
-        // console.log("BIG EVENT:  ", incomingMessage);
-        // // code to handle incoming message
+        // code to handle incoming message
+
+        const incomingMessage = JSON.parse(event.data);
+
+        if (incomingMessage.type !== 'notification' && incomingMessage.type !== 'message') {
+          
+          // eventType = 'notification'
+
+          this.setState({
+            userCount: incomingMessage
+          });
+          // console.log('Count: ', this.state.userCount);
+        }
+ 
+
+        
 
         const newMessages = this.state.messages.concat(incomingMessage);
-        console.log(newMessages);
+        //console.log(newMessages);
+        
         this.setState(
           { messages: newMessages }
         );
       }
-
-      // this.socket.send("""Hellooooooo1");
-
 
     }
 
@@ -94,9 +129,9 @@ class App extends Component {
     
     return (
       <div>
-        <Navbar />
-        <MessageList messages={this.state.messages}/>
-        <Chatbar currentUser={this.state.currentUser} addMessage={this.addMessage}/>
+        <Navbar count={this.state.userCount}/>
+        <MessageList messages={this.state.messages} />
+        <Chatbar currentUser={this.state.currentUser} changeUser={this.changeUser} addMessage={this.addMessage}/>
       </div>
     );
   }

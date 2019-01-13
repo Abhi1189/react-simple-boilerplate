@@ -8,7 +8,6 @@ export class Message extends Component {
 
 
   render() {
-    console.log(this.props.user);
     return (
       <div className="message" key={this.props.id}>
         <span className="message-username">{this.props.user}</span>
